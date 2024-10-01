@@ -1,40 +1,46 @@
 // index.js
-const express = require("express");
-const cors = require("cors");
+const express = require('express');
+const cors = require('cors');
+const products = require('./data/products');
+const axios = require('axios');
+
 
 const app = express();
-const PORT = 5000; // You can change this port if needed
+const PORT = 5000;
 
-app.use(cors()); // Allow cross-origin requests
-app.use(express.json());
+// Enable CORS
+app.use(cors());
 
-// Dummy data
-const products = [
-  {
-    id: 1,
-    name: "Product 1",
-    price: 100,
-    description: "Description for Product 1",
-  },
-  {
-    id: 2,
-    name: "Product 2",
-    price: 200,
-    description: "Description for Product 2",
-  },
-  {
-    id: 3,
-    name: "Product 3",
-    price: 300,
-    description: "Description for Product 3",
-  },
-];
+// Route to get all products
+app.get('/api/products',async (req, res) => {
+try {
+  const response=await axios.get('https://dummyjson.com/products');
+  res.json(response.data.products);
 
-// API endpoint to fetch products
-app.get("/products", (req, res) => {
-  res.json(products);
+  
+} catch (error) {
+  console.error('Error fetching products:', error);
+    res.status(500).send('Error fetching products');
+}
+
+
 });
 
+// Route to get product by ID
+app.get('/api/products/:id', async(req, res) => {
+  const productid=req.params.id;
+ try {
+  const response=await axios.get(`https://dummyjson.com/products/${productid}`);
+  res.json(response.data);
+
+  
+ } catch (error) {
+  console.error('Error fetching product:', error);
+    res.status(404).send('Product not found');
+ }
+});
+
+// Start the server
 app.listen(PORT, () => {
-  console.log(`Server is running on http:localhost:${PORT}`);
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
